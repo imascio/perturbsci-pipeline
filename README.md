@@ -17,4 +17,8 @@ rna3
 rna4
 ```
 
-### 
+### Genome Reference
+This pipeline uses STAR to align your reads. Build or download a reference such as the one from [10X Genomics](https://support.10xgenomics.com/single-cell-gene-expression/software/downloads/latest?). If you don't already have STAR indices built from the refernce, you will have to do that with:
+```{bash}
+STAR --runThreadN 4 --runMode genomeGenerate --genomeDir path/to/star/output/reference --genomeFastaFiles path/to/fasta/refernce.tar.gz
+```

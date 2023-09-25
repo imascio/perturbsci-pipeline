@@ -1,6 +1,11 @@
 # perturbsci-pipeline
 A processing pipeline that will take fastq reads produced from a PerturbSci library preparation with a NextSeq 550 75 cycle kit and output a counts matrix and a seurat object.
 
+Run the pipeline as...
+```{bash}
+bash main_pipeline.sh > output.log 2> messages.log
+```
+
 ## Create the conda environment
 Create a conda environment with the required packages from the provided YAML file.
 ```{bash}

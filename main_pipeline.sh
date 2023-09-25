@@ -89,7 +89,7 @@ for sample in $(cat $sample_ID); do echo changing name $sample; mv $input_folder
 
 echo "Attaching barcode and UMI...." >&2
 mkdir -p $output_folder
-parallel -j ${N_JOBS} --verbose python $script $input_folder {} $output_folder $ligation_barcode $RT_barcode $core $randomN_barcode_file :::: ${sample_ID}
+python $script $input_folder $sample_ID $output_folder $ligation_barcode $RT_barcode $core $randomN_barcode_file
 echo "Barcode transformed and UMI attached." >&2
 
 ################# TRIM READ 2 #################
@@ -166,7 +166,7 @@ for sample in $(cat $gdo_sample_ID); do echo changing name $sample; mv $fastq_fo
 
 # Run the guide counting script
 echo "Processing the gdo reads into single-cell counts matrix (must be reformatted for seurat later)..." >&2
-parallel -j ${N_JOBS} --verbose python3 $script_path/sgrna_count.py $fastq_folder {} $gdo_processing_folder $RT_barcode_file $inner_i7_bc_file $ligation_barcode_file $gRNA_correction_file $gRNA_annotation_df $cutoff $core :::: ${gdo_sample_ID}
+python3 $script_path/sgrna_count.py $fastq_folder ${gdo_sample_ID} $gdo_processing_folder $RT_barcode_file $inner_i7_bc_file $ligation_barcode_file $gRNA_correction_file $gRNA_annotation_df $cutoff $core
 
 
 ############ SEURAT ############

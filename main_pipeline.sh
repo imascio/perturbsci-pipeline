@@ -23,13 +23,23 @@ fastq_folder="/brahms/shared/EasySci/fastq"
 # change to the following line after troubleshooting phase is done
 #fastq_folder=$project_folder/fastq
 
-# define the PCR group sample id for each fastq file
+# define the PCR group sample id for each gene experssion fastq file
 sample_ID="/brahms/shared/EasySci/fastq/gex_sampleID.txt"
 
-# define the output folder where all processing files will be written, inside the project folder
+
+# define the PCR group sample id for each sgRNA fastq file
+gdo_sample_ID="/gpfs/commons/home/imascio/lab/APA_pilot/PerturbSci/gdo_sampleID.txt"
+
+# define the output folder where all processing files for gene expression will be written, inside the project folder
 gex_processing_folder=$project_folder/gex_processing
 
-# define the core number for parallele processing
+# define the output folder where all processing files for sgRNA will be written, inside the project folder
+gdo_processing_folder=$project_folder/gdo_processing
+
+# define the number of gRNA UMI cutoff for keeping cells
+cutoff=10
+
+# define the core number for parallel processing
 core=16
 
 # define the core number for reads filtering and sorting
@@ -56,6 +66,13 @@ ligation_barcode=$script_path/Ligation_barcodes_NextSeq.pickle2
 RT_barcode=$script_path/RT_barcodes.pickle2
 # define the location of the randomN RT barcodes for the gene counting step
 randomN_barcode_file=$script_path/RandomN_RT_barcodes.txt
+#define the folder of inner i7 barcode dictionary
+inner_i7_bc_file=$script_path/simp_inner_i7_220517.pickle2
+
+#define the folder of gRNA barcode dictionary
+gRNA_correction_file="/gpfs/commons/home/imascio/lab/APA_pilot/PerturbSci/APA_1SRSF7_sgRNAseq.pickle2"
+#define the folder containing the gRNA annotation file
+gRNA_annotation_df="/gpfs/commons/home/imascio/lab/APA_pilot/PerturbSci/APA_1SRSF7_sgRNA_info_table.txt"
 
 # define the name of the final seuart object - should be .rds extension
 seurat_object_name=ran1_seurat_obj.rds
@@ -68,7 +85,7 @@ seurat_object_name=ran1_seurat_obj.rds
 input_folder=$fastq_folder
 output_folder=$gex_processing_folder/BC_attach
 script=$script_path/barcode_extraction.py
-echo "Changing the name of the fastq files..." >&2
+echo "Changing the name of the gex fastq files..." >&2
 
 echo $sample_ID >&2
 for sample in $(cat $sample_ID); do echo changing name $sample; mv $input_folder/*$sample*R1*.fastq.gz $input_folder/$sample.R1.fastq.gz; mv $input_folder/*$sample*R2*.fastq.gz $input_folder/$sample.R2.fastq.gz; mv $input_folder/*$sample*R3*.fastq.gz $input_folder/$sample.R3.fastq.gz; done
@@ -137,13 +154,25 @@ echo "Mapping to genes complete." >&2
 
 # Remove UMI duplicates and generate a cell x gene counts matrix
 
-echo "Generating a counts matrix! Almost done..." >&2
+echo "Generating a counts matrix! Almost done w gex processing..." >&2
 
 input_folder=$gex_processing_folder/feature
 output_folder=$gex_processing_folder/count
 mkdir -p $output_folder
 
 parallel -j ${N_JOBS} --verbose bash $script_path/count.sh $input_folder $output_folder {} :::: ${sample_ID}
+
+
+############ GDO ############
+
+# Change the file names of raw gdo fastq.gz
+echo "Changing the name of the gdo fastq files..." >&2
+for sample in $(cat $gdo_sample_ID); do echo changing name $sample; mv $fastq_folder/*$sample*R1_001.fastq.gz $fastq_folder/$sample.R1.fastq.gz; mv $fastq_folder/*$sample*R2_001.fastq.gz $fastq_folder/$sample.R2.fastq.gz; mv $fastq_folder/*$sample*R3_001.fastq.gz $fastq_folder/$sample.R3.fastq.gz; done
+
+# Run the guide counting script
+echo "Start identifying single cells, gRNA sequence and UMI..."
+parallel -j ${N_JOBS} --verbose python3 $script_path/sgrna_count.py $fastq_folder {} $gdo_processing_folder $RT_barcode_file $inner_i7_bc_file $ligation_barcode_file $gRNA_correction_file $gRNA_annotation_df $cutoff $core :::: ${gdo_sample_ID}
+
 
 ############ SEURAT ############
 

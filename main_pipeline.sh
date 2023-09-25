@@ -99,7 +99,6 @@ echo "Barcode transformed and UMI attached." >&2
 echo "Trimming read 2..." >&2
 
 input_folder=$gex_processing_folder/BC_attach
-sampleID=$(head -n 1 $sample_ID)
 output_folder=$gex_processing_folder/trimmed_fastq
 mkdir -p $output_folder
 
@@ -111,7 +110,6 @@ parallel -j ${N_JOBS} --verbose bash $script_path/trimming.sh $input_folder {} $
 
 echo "\nRemoving empty lines from fastqs" >&2
 
-sampleID=$(head -n 1 $sample_ID)
 input_folder=$gex_processing_folder/trimmed_fastq
 output_folder=$gex_processing_folder/cleaned_fastq
 mkdir -p $output_folder

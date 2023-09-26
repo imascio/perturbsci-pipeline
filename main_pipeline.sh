@@ -160,13 +160,15 @@ parallel -j ${N_JOBS} --verbose bash $script_path/count.sh $input_folder $output
 
 ############ GDO ############
 
+mkdir -p $gdo_processing_folder
+
 # Change the file names of raw gdo fastq.gz
 echo "Changing the name of the gdo fastq files..." >&2
 for sample in $(cat $gdo_sample_ID); do echo changing name $sample; mv $fastq_folder/*$sample*R1_001.fastq.gz $fastq_folder/$sample.R1.fastq.gz; mv $fastq_folder/*$sample*R2_001.fastq.gz $fastq_folder/$sample.R2.fastq.gz; mv $fastq_folder/*$sample*R3_001.fastq.gz $fastq_folder/$sample.R3.fastq.gz; done
 
 # Run the guide counting script
 echo "Processing the gdo reads into single-cell counts matrix (must be reformatted for seurat later)..." >&2
-python3 $script_path/sgrna_count.py $fastq_folder ${gdo_sample_ID} $gdo_processing_folder $RT_barcode_file $inner_i7_bc_file $ligation_barcode_file $gRNA_correction_file $gRNA_annotation_df $cutoff $core
+python3 $script_path/sgrna_count.py $fastq_folder ${gdo_sample_ID} $gdo_processing_folder $RT_barcode $inner_i7_bc_file $ligation_barcode $gRNA_correction_file $gRNA_annotation_df $cutoff $core
 
 
 ############ SEURAT ############

@@ -181,7 +181,7 @@ input_folder=$gex_processing_folder/count
 output_folder=$gex_processing_folder/seurat
 mkdir -p $output_folder
 
-Rscript $script_path/make_seurat_object.R $sampleID $input_folder $output_folder $seurat_object_name $gdo_processing_folder
+Rscript $script_path/make_seurat_object.R $sample_ID $input_folder $output_folder $seurat_object_name $gdo_processing_folder
 
 
 echo "You're done ;)" >&2

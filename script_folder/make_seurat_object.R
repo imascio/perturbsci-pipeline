@@ -1,18 +1,18 @@
-### August 1, 2023 ###
-# load packages
-#devtools::install_github("satijalab/seurat", "seurat5")
-library(Seurat)
-library(SeuratObject)
-library(tidyverse)
-#library(Matrix)
-library(data.table)
-#devtools::install_github("satijalab/azimuth", "seurat5")
-library(Azimuth)
-#library(biomaRt)
-#library(org.Hs.eg.db)
-#install.packages("genio")
-library(genio)
+### September 26, 2023 ###
+# List of package names you want to install
+packages_to_install <- c("Seurat", "SeuratObject", "tidyverse", "data.table", "Azimuth", "genio", "Matrix")
 
+# Check and install packages if not already installed
+for (package_name in packages_to_install) {
+  if (!require(package_name, character.only = TRUE)) {
+    install.packages(package_name)
+  }
+}
+
+# Load the packages
+for (package_name in packages_to_install) {
+  library(package_name, character.only = TRUE)
+}
 
 ## read in arguments following terminal command
 # order of arguments 1)gex_sampleID.txt 2)input_dir_counts_matrix 3)output_dir 4)output_name.rds 5)gdo_processing_dir

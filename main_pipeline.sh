@@ -57,6 +57,9 @@ gtf_file="/brahms/shared/EasySci/human/gencode.v42.primary_assembly.annotation.g
 # Human genome version 42
 gtf_file_exon="/brahms/shared/EasySci/human/gencode.v42.primary_assembly.annotation.exons.gtf"
 
+# define the location for STAR to make the tmp files - this can be your working directory unless FIFO files cannot be written to it
+tmp_folder="/home/mascioi"
+
 # define the location of the ligation barcodes
 ligation_barcode=$script_path/Ligation_barcodes_NextSeq.pickle2
 # define the location of the RT barcodes
@@ -120,14 +123,13 @@ echo "Empty lines removed" >&2
 
 ############ ALIGN ############
 
-
 echo "Aligning cleaned fastq files..." >&2
 
 input_folder=$gex_processing_folder/cleaned_fastq
 output_folder=$gex_processing_folder/STAR_alignment
 mkdir -p $output_folder
 
-parallel -j ${N_JOBS} --verbose bash $script_path/align.sh $index {} $input_folder $output_folder :::: ${sample_ID}
+parallel -j ${N_JOBS} --verbose bash $script_path/align.sh $index {} $input_folder $output_folder $tmp_folder :::: ${sample_ID}
 
 echo "Alignment complete." >&2
 

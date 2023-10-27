@@ -202,7 +202,7 @@ input_folder=$gex_processing_folder/count
 output_folder=$gex_processing_folder/seurat
 mkdir -p $output_folder
 
-Rscript $script_path/make_seurat_object.R $sample_ID $input_folder $output_folder $seurat_object_name $gdo_processing_folder
+Rscript $script_path/make_seurat_object.R $sample_ID $input_folder $output_folder $seurat_object_name $gdo_processing_folder $script_path
 
 now=$(date +"%T")
 echo "You're done ;) $now" >&2

@@ -15,7 +15,7 @@ for (package_name in packages_to_install) {
 }
 
 ## read in arguments following terminal command
-# order of arguments 1)gex_sampleID.txt 2)input_dir_counts_matrix 3)output_dir 4)output_name.rds 5)gdo_processing_dir
+# order of arguments 1)gex_sampleID.txt 2)input_dir_counts_matrix 3)output_dir 4)output_name.rds 5)gdo_processing_dir 6)script_folder
 args <- commandArgs(trailingOnly = TRUE)
 
 ############################GEX PROCESSING####################################################
@@ -109,17 +109,28 @@ gRNA_mat <- as.matrix(gRNA_count)
 colnames_gdo <- colnames(gRNA_mat)
 # making a table of the combinations of barcodes in order of colnames
 gdo_bc_combinations <- data.frame(inneri7 = substr(gsub("\\..*","",colnames_gdo) , start = 4 , stop = 13),
-                                  shortdT = substr(gsub(".*\\.","",colnames_gdo) , start = 11 , stop = 20),
+                                  sgRNAcapture = substr(gsub(".*\\.","",colnames_gdo) , start = 11 , stop = 20),
                                   lig = substr(gsub(".*\\.","",colnames_gdo) , start = 1 , stop = 10))
 
 # making inner i7 list
-i7list <- data.frame(i7_ID = as.character(c(1:8)),
+i7list <- data.frame(i7_ID = sample_names[,1],
                      inneri7 = c("TCGGATTCGG", "CTAAGCCTTG", "CTAACTAGGT", "GCAAGACCGT", "ATGGAACGAA", "TAGAGGCGTT", "GCATCGTATG", "TGGACGACTA"))
 gdo_bc_i7ID <- left_join(x = gdo_bc_combinations, y = i7list)
-new_gd_colnames <- paste0(gdo_bc_i7ID$i7_ID, "_" ,gdo_bc_i7ID$lig,gdo_bc_i7ID$shortdT)
+
+# matching the sgRNA capture barcode with the barcode of the corresponding shortdT barcode from plate 2
+gdo_bc_i7ID$RT <- NA
+
+all.bc <- read.csv(paste0(args[6],"/rt_lig_ligrc_sgrnacapt_barcodes.csv"))
+
+for (i in 1: nrow(gdo_bc_i7ID)) {
+  gdo_bc_i7ID$RT[i] <- all.bc$shortdT2[gdo_bc_i7ID$sgRNAcapture[i] == all.bc$sgRNAcapture]
+}
+
+new_gd_colnames <- paste0(gdo_bc_i7ID$i7_ID, "_" ,gdo_bc_i7ID$lig,gdo_bc_i7ID$RT)
 colnames(gRNA_mat) <- new_gd_colnames
+
 # save processed guide matrix
-saveRDS(gRNA_mat, paste0(args[3],"gdo_procesed_matrix.rds"))
+saveRDS(gRNA_mat, paste0(args[3],"/gdo_procesed_matrix.rds"))
 #################################################################################################
 
 ##############################MERGING GEX AND GDO INTO ONE OBJECT################################

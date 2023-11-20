@@ -158,6 +158,19 @@ parallel -j ${N_JOBS} --verbose bash $script_path/feature.sh $gtf_file {} $input
 now=$(date +"%T")
 echo "Mapping to genes complete. $now" >&2
 
+############ DEDUP BAMS ############
+
+# Remove UMI duplicates and generate a cell x gene counts matrix
+
+now=$(date +"%T")
+echo "Generating a counts matrix! Almost done w gex processing... $now" >&2
+
+input_folder=$gex_processing_folder/feature
+output_folder=$gex_processing_folder/dedup
+mkdir -p $output_folder
+
+parallel -j ${N_JOBS} --verbose bash $script_path/dedup.sh $input_folder $output_folder {} :::: ${sample_ID}
+
 ############ COUNT ############
 
 # Remove UMI duplicates and generate a cell x gene counts matrix

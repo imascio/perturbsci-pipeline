@@ -1,5 +1,5 @@
 # perturbsci-pipeline
-A processing pipeline that will take fastq reads produced from a PerturbSci library preparation with a NextSeq 550 75 cycle kit and output a counts matrix and a seurat object.
+A processing pipeline that will take fastq reads produced from a PerturbSci library preparation with a NextSeq 550 75 cycle kit and output a counts matrix and a seurat object. This runs on Croen well due to the parallelization.
 
 ## Create the conda environment
 Create a conda environment with the required packages from the provided YAML file.
@@ -42,6 +42,6 @@ Run the pipeline as:
 ```{bash}
 bash main_pipeline.sh > output.log 2> messages.log
 ```
-Errors and other messages will be saved to messages.log and normal output will be written to outpt.log.
+Errors and other messages will be saved to messages.log and normal output will be written to output.log.
 
 You will get fastq files and sam files ouput at each processing step in the `gex_processing` directory. The guide counts will be output to the `gdo_processing` directory. You will get a final seurat object with the guide and gene expression counts in the `gex_processing` directory. Proceed by checking the QC metrics (nCount_RNA, nFeature_RNA, nCount_GDO) and follow Seurat clustering workkflows to analyze your data, including the `MULTIseqDemux` function to assign guides. 

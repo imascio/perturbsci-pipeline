@@ -14,6 +14,10 @@ for (package_name in packages_to_install) {
   library(package_name, character.only = TRUE)
 }
 
+
+
+rm(package_name, packages_to_install)
+
 ## read in arguments following terminal command
 # order of arguments 1)gex_sampleID.txt 2)input_dir_counts_matrix 3)output_dir 4)output_name.rds 5)gdo_processing_dir 6)script_folder 7)gdo_sampleID.txt
 args <- commandArgs(trailingOnly = TRUE)

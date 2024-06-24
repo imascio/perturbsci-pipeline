@@ -30,6 +30,9 @@ gex_processing_folder=$project_folder/gex_processing
 # define the output folder where all processing files for sgRNA will be written, inside the project folder
 gdo_processing_folder=$project_folder/gdo_processing
 
+# define the length of read 2, which can only be a numeric value of 54 or 55 - the sgRNA counting script will not work if the read 2 length is not 54 or 55
+read2_length=55
+
 # define the number of gRNA UMI cutoff for keeping cells
 cutoff=10
 
@@ -201,7 +204,19 @@ for sample in $(cat $gdo_sample_ID); do echo changing name $sample; mv $fastq_fo
 now=$(date +"%T")
 echo "Processing the gdo reads into single-cell counts matrix (must be reformatted for seurat later)... $now" >&2
 
-python3 $script_path/sgrna_count.py $fastq_folder ${gdo_sample_ID} $gdo_processing_folder $RT_barcode $inner_i7_bc_file $ligation_barcode $gRNA_correction_file $gRNA_annotation_df $cutoff $core
+## setting the guide counting script depending on the length of read 2
+if [ $read2_length -eq 55 ]; then
+    guide_script="sgrna_20bp_count.py"
+elif [ $read2_length -eq 54 ]; then
+    guide_script="sgrna_19bp_count.py"
+else
+    echo "Error: read2_length must be either 54 or 55"
+    exit 1
+fi
+# Print the script variable to verify
+echo "The selected script is: $guide_script"
+
+python3 ${script_path}/${guide_script} $fastq_folder ${gdo_sample_ID} $gdo_processing_folder $RT_barcode $inner_i7_bc_file $ligation_barcode $gRNA_correction_file $gRNA_annotation_df $cutoff $core
 
 
 ############ SEURAT ############

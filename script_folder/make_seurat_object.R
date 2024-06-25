@@ -112,7 +112,7 @@ save(gRNA_df_cell, gRNA_df_gene, gRNA_count, file = paste0(args[3], "/gRNA_Summa
 gRNA_mat <- as.matrix(gRNA_count)
 colnames_gdo <- colnames(gRNA_mat)
 # making a table of the combinations of barcodes in order of colnames
-gdo_bc_combinations <- data.frame(inneri7 = substr(gsub("\\..*","",colnames_gdo) , start = 4 , stop = 13),
+gdo_bc_combinations <- data.frame(inneri7 = str_extract(gsub("\\..*","",colnames_gdo) , "[A-Z]+"),
                                   sgRNAcapture = substr(gsub(".*\\.","",colnames_gdo) , start = 11 , stop = 20),
                                   lig = substr(gsub(".*\\.","",colnames_gdo) , start = 1 , stop = 10))
 

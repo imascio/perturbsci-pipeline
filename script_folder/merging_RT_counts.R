@@ -112,14 +112,14 @@ new.rna <- rbindlist(lapply(list(shortdT.RNA, randHex.RNA), function(x) setDT(as
 # converting to data frame from data table to remove the rn column and make it the rownames
 new.rna.df <- as.data.frame(new.rna)
 rownames(new.rna.df) <- new.rna.df$rn
-new.rna.df <- select(new.rna.df, -c("rn"))
+new.rna.df <- dplyr::select(new.rna.df, -c("rn"))
 
 # doing the same with guide counts matrix
 new.gdo <- rbindlist(lapply(list(shortdT.GDO, randHex.GDO), function(x) setDT(as.data.frame(x), 
                                                keep.rownames = TRUE)), fill = TRUE)[, lapply(.SD, sum, na.rm = TRUE), by = rn]
 new.gdo.df <- as.data.frame(new.gdo)
 rownames(new.gdo.df) <- new.gdo.df$rn
-new.gdo.df <- select(new.gdo.df, -c("rn"))
+new.gdo.df <- dplyr::select(new.gdo.df, -c("rn"))
 
 
 # make the seurat object

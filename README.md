@@ -1,5 +1,5 @@
 # perturbsci-pipeline
-A processing pipeline that will take fastq reads produced from a PerturbSci library preparation with a NextSeq 550 75 cycle kit and output a counts matrix and a seurat object. This runs on Croen well due to the parallelization.
+A processing pipeline that will take fastq reads produced from a PerturbSci library preparation with a NextSeq 550 75 cycle kit and output a counts matrix and a seurat object. This runs on Croen well due to the parallelization. You need to run bcl2fastq yourself on NYGC clusters and move the fastqs over to our servers.
 
 ## Create the conda environment
 Create a conda environment with the required packages from the provided YAML file.
@@ -47,4 +47,4 @@ Errors and other messages will be saved to messages.log and normal output will b
 You will get fastq files and sam files ouput at each processing step in the `gex_processing` directory. The guide counts will be output to the `gdo_processing` directory. You will get a final seurat object with the guide and gene expression counts in the `gex_processing` directory. Proceed by checking the QC metrics (nCount_RNA, nFeature_RNA, nCount_GDO) and follow Seurat clustering workkflows to analyze your data, including the `MULTIseqDemux` function to assign guides. 
 
 ### Making Seurat Object
-Since this script has to connect to ENSEMBL, which sometimes stalls out, it is not unlikely that it may fail. If you have output in the `gex_processing/count` and `gdo_processing` directories, just open this script up in R and run it line by line on your own. Additionally, sometimes new package updates may cause dependencies to fail and the script may error out as well.
+Since this script has to connect to ENSEMBL, which sometimes stalls out, it is not unlikely that it may fail. If you have output in the `gex_processing/count` and `gdo_processing` directories, just open this script up in R and run it line by line on your own. Additionally, sometimes new package updates may cause dependencies to fail and the script may error out as well. I often have issues with merging guide counts to cells in the object. So definitely don't count on this seurat object to be correct. Sorry :(

@@ -29,6 +29,7 @@ gex.list <- list()
 gex.seuratv5.list <- list()
 n_pcr_samples <- count_lines(args[1])
 sample_names <- read.table(args[1])
+gdo_names <-read.table(args[7])
 
 # if converting to ensemble times out you will have to start the for loop over again
 # but can change the starting number from 1 to pick up on the last object made
@@ -64,8 +65,8 @@ objv5$sample <- gsub("_[0-9]","",objv5$pcr_barcode)
 
 cells <- colnames(objv5)
 rtlig.barcodes <- str_split_fixed(cells, "[0-9]_", n=2)[,2]
-ligation.barcodes <-  substr( rtlig.barcodes , start = 1, stop = 10)
-rt.barcodes <- substr( rtlig.barcodes , start = 11 , stop = 20)
+ligation.barcodes <-  substr(rtlig.barcodes, start = 1, stop = 10)
+rt.barcodes <- substr(rtlig.barcodes, start = 11 , stop = 20)
 
 objv5$rt.barcode <- rt.barcodes
 objv5$lig.barcode <- ligation.barcodes
@@ -112,20 +113,15 @@ save(gRNA_df_cell, gRNA_df_gene, gRNA_count, file = paste0(args[3], "/gRNA_Summa
 gRNA_mat <- as.matrix(gRNA_count)
 colnames_gdo <- colnames(gRNA_mat)
 # making a table of the combinations of barcodes in order of colnames
-gdo_bc_combinations <- data.frame(inneri7 = str_extract(gsub("\\..*","",colnames_gdo) , "[A-Z]+"),
+gdo_bc_combinations <- data.frame(inneri7 = gsub("\\..*","",colnames_gdo),
                                   sgRNAcapture = substr(gsub(".*\\.","",colnames_gdo) , start = 11 , stop = 20),
                                   lig = substr(gsub(".*\\.","",colnames_gdo) , start = 1 , stop = 10))
 
-# making inner i7 list
-# read in gdo sample IDs - make a vector
-gdo_sampleID <- read.table(args[7]) %>% pull
-gdo_sampleID_inneri7 <- c()
-for (i in 1:length(gdo_sampleID)) {
-  gdo_sampleID_inneri7 <- c(gdo_sampleID_inneri7, paste0(gdo_sampleID[i],c("TCGGATTCGG", "CTAAGCCTTG", "CTAACTAGGT", "GCAAGACCGT", "ATGGAACGAA", "TAGAGGCGTT", "GCATCGTATG", "TGGACGACTA")))
-}
-
+# making inner i7 list - need both gex and gdo sample info to correctly combine the pcr rna barcodes
+gdo.df <- expand.grid(c("TCGGATTCGG", "CTAAGCCTTG", "CTAACTAGGT", "GCAAGACCGT", "ATGGAACGAA", "TAGAGGCGTT", "GCATCGTATG", "TGGACGACTA"),gdo_names[,1])
+sample_inner_combos <- paste0(gdo.df$Var2, gdo.df$Var1)
 i7list <- data.frame(i7_ID = sample_names[,1],
-                     inneri7 = gdo_sampleID_inneri7)
+                     inneri7 = sample_inner_combos)
 gdo_bc_i7ID <- left_join(x = gdo_bc_combinations, y = i7list)
 
 # matching the sgRNA capture barcode with the barcode of the corresponding shortdT barcode from plate 2
@@ -137,7 +133,7 @@ gdo_bc_i7ID <- left_join(x = gdo_bc_combinations, y = i7list)
 #   gdo_bc_i7ID$RT[i] <- all.bc$shortdT2[gdo_bc_i7ID$sgRNAcapture[i] == all.bc$sgRNAcapture]
 # }
 
-# the new plates have sgRNA capture match the RT barcodes so RT and sgRNA capture sequences are the same 
+# the new plates have sgRNA capture match the RT shortdT barcodes so RT and sgRNA capture sequences are the same 
 gdo_bc_i7ID$RT <- gdo_bc_i7ID$sgRNAcapture
 
 new_gd_colnames <- paste0(gdo_bc_i7ID$i7_ID, "_" ,gdo_bc_i7ID$lig,gdo_bc_i7ID$RT)

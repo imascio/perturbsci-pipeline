@@ -41,7 +41,12 @@ Both the info table .txt file and .pickle2 file are inputs for the main script f
 
 
 ## Run the Pipeline
-After changing all the variables in the beginning of the `main_pipeline.sh` file to fit your experiment, you can run the pipeline. Run the pipeline as:
+After changing all the variables in the beginning of the `main_pipeline.sh` file to fit your experiment, you can run the pipeline. 
+
+First, activate a tmux session (or soemthing similar so when your laptop goes to sleep the pipeline isn't killed.
+Then, activate your conda environment, which should be called EasySci if you ran the code from above.
+
+Now you can run the pipeline as:
 ```{bash}
 bash main_pipeline.sh > output.log 2> messages.log
 ```

@@ -18,6 +18,13 @@ rna02
 rna03
 rna04
 ```
+An example of 2 guide enrichment PCR barcodes would be:
+```
+gdo1
+gdo2
+```
+
+Additionally, rna01-rna08 are always associated with gdo1, rna09-16 are always associated with gdo2, etc. So make sure if your sample sheet the barcode sequences correspond to this. (Ask me if this is confusing.)
 
 ### Genome Reference
 This pipeline uses STAR to align your reads. Build or download a reference such as the one from [10X Genomics](https://support.10xgenomics.com/single-cell-gene-expression/software/downloads/latest?). If you don't already have STAR indices built from the refernce, you will have to do that with:

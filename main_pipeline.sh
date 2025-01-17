@@ -33,6 +33,9 @@ gdo_processing_folder=$project_folder/gdo_processing
 # define the length of read 2, which can only be a numeric value of 54 or 55 - the sgRNA counting script will not work if the read 2 length is not 54 or 55
 read2_length=55
 
+# feature type will set the feature.sh script to output counts using ENSEMBL IDs or gene names - this parameter must equal "gene_name" or "ENSEMBL" or the script won't run
+feature_type="gene_name"
+
 # define the number of gRNA UMI cutoff for keeping cells
 cutoff=10
 
@@ -156,7 +159,22 @@ input_folder=$gex_processing_folder/STAR_alignment
 output_folder=$gex_processing_folder/feature
 mkdir -p $output_folder
 
-parallel -j ${N_JOBS} --verbose bash $script_path/feature.sh $gtf_file {} $input_folder $output_folder :::: ${sample_ID}
+#!/bin/bash
+
+# Check the value of $feature_type and set $feature_script accordingly
+if [ "$feature_type" == "gene_name" ]; then
+    feature_script="gene.name.feature.sh"
+elif [ "$feature_type" == "ENSEMBL" ]; then
+    feature_script="ENSEMBL.feature.sh"
+else
+    echo "Error: feature_type must be either 'gene_name' or 'ENSEMBL'"
+    exit 1
+fi
+
+# Print the selected script to verify
+echo "The selected feature script is: $feature_script"
+
+parallel -j ${N_JOBS} --verbose bash ${script_path}/${feature_script} $gtf_file {} $input_folder $output_folder :::: ${sample_ID}
 
 now=$(date +"%T")
 echo "Mapping to genes complete. $now" >&2

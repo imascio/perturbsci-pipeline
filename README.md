@@ -8,7 +8,7 @@ conda env create --name EasySci --file=EasySci_conda_env.yaml
 ```
 
 ## Input parameters
-These parameters are input at the beginning of the `main_pipeline.sh` file and vary based on your specific experiment.
+These parameters are input at the beginning of the `main_pipeline.sh` file and vary based on your specific experiment. Check out the parameters $feature_type and $read2_length to make sure they match your experiment. They are commented in the `main_pipeline.sh` file.
 
 ### Sample ID files
 Create two files, one for RNA samples and one for guide samples. These are .txt files where each line is the sample name for the corresponding PCR barcode. Subsequently these are the sample names that are added to the fastq files after demultiplexing as they are provided in the sample sheet mentioned above. An example for 4 PCR barcodes would be:

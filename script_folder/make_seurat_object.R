@@ -1,4 +1,4 @@
-### September 26, 2023 ###
+### January 17, 2025 ###
 # List of package names you want to install
 packages_to_install <- c("Seurat", "SeuratObject", "tidyverse", "data.table", "Azimuth", "genio", "Matrix")
 
@@ -13,8 +13,6 @@ for (package_name in packages_to_install) {
 for (package_name in packages_to_install) {
   library(package_name, character.only = TRUE)
 }
-
-
 
 rm(package_name, packages_to_install)
 
@@ -33,22 +31,33 @@ gdo_names <-read.table(args[7])
 
 # if converting to ensemble times out you will have to start the for loop over again
 # but can change the starting number from 1 to pick up on the last object made
+# also there are lines commented out that can be used instead of ENSEMBL but I have come across issues with it which is why I prefer ENSEMBL
 for (i in 1:n_pcr_samples) {
   # read in counts
   name <- sample_names$V1[i]
+  print(name)
   c <- fread(file = 
                paste0(args[2],"/",name, "_counts.tsv.gz"))
   # save df without gene column and set gene column as rownames
   rownames(c) <- c$gene
   m <- as.matrix(c[,2:ncol(c)], nrow = nrow(c))
+  #genes.ens <- c$gene
   rownames(m) <- c$gene
-  rownames(m) <- gsub("(ENSG[0-9]+)\\.[0-9]+", "\\1", rownames(m))
-  n <- Azimuth:::ConvertEnsembleToSymbol(m, species = "human")
+  #genes.ens.short <- gsub("(ENSG[0-9]+)\\.[0-9]+", "\\1", genes.ens)
+  #ids <- mapIds(org.Hs.eg.db,
+                #keys=genes.ens,
+                #column="SYMBOL",
+                #keytype="ENSEMBL",
+                #multiVals="first")
+  #rownames(m) <-ids
+  #n <- Azimuth:::ConvertEnsembleToSymbol(m, species = "human")
+  n <- m
   gex.list[[i]] <- n
   # saving seurat objects
   obj <- CreateSeuratObject(counts = n, min.features = 200)
   obj$pcr_barcode <- name
   gex.seuratv5.list[[i]] <- obj
+  print("done")
 }
 
 # combining all seurat objects together
@@ -124,7 +133,8 @@ i7list <- data.frame(i7_ID = sample_names[,1],
                      inneri7 = sample_inner_combos)
 gdo_bc_i7ID <- left_join(x = gdo_bc_combinations, y = i7list)
 
-# matching the sgRNA capture barcode with the barcode of the corresponding shortdT barcode from plate 2
+# if your shortdT RT plates do not have matching sgRNA barcodes you can use this commented out code
+# to match the sgRNA capture barcode with the barcode of the corresponding shortdT barcode plate (in this example it's plate 2)
 # gdo_bc_i7ID$RT <- NA
 
 # all.bc <- read.csv(paste0(args[6],"/rt_lig_ligrc_sgrnacapt_barcodes.csv"))
@@ -169,7 +179,7 @@ obj[["GDO"]] <- CreateAssayObject(counts = gdo.subset)
 #################################################################################################
 
 ##############################ADD GDO META#############################################
-## adding guide metadata
+## adding guide metadata - you can skip this section if you want
 # making dataframe with cell names, guide counts, and a binning category
 guide.meta <- data.frame(cells = names(obj$nCount_GDO), counts = obj$nCount_GDO, guide_group = NA)
 # guides less than 10
@@ -185,5 +195,9 @@ guide.meta[guide.meta$counts >= 100, 3] <- "100+"
 guide.meta2 <- data.frame(sgRNA_count = guide.meta$guide_group, row.names = guide.meta$cells)
 
 obj <- AddMetaData(obj, metadata = guide.meta2)
+
+#######################################################################################
+
+#######################################save the final object!################################################
 saveRDS(obj, paste0(args[3],"/",args[4]))
 #######################################################################################

@@ -46,6 +46,8 @@ Then change what your sgRNA info table is called in the `gRNA_pilot_screen_file`
 
 Both the info table .txt file and .pickle2 file are inputs for the main script file.
 
+### Gene Name Output
+The `feature_type` parameter refers to whether you want the counts matrix to have ENSEMBL IDs or gene names as the row names. This parameter must be equal to "ENSEMBL" or "gene_name", respectively, for the script to work.
 
 ## Run the Pipeline
 After changing all the variables in the beginning of the `main_pipeline.sh` file to fit your experiment, you can run the pipeline. 

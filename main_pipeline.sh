@@ -2,10 +2,11 @@
 
 #run as bash main_pipeline.sh > output.log 2> messages.log
 
+## refer to README as this code rarely works - activate the conda environment prior to running the script
 ## Location of the bashrc file to activate the conda environments.
-activate_location="~/.bashrc"
-source $activate_location
-conda activate EasySci
+## activate_location="~/.bashrc"
+## source $activate_location
+## conda activate EasySci
 
 # Define script directory
 script_path="/brahms/shared/EasySci/shell_pipeline/script_folder"

@@ -160,8 +160,6 @@ input_folder=$gex_processing_folder/STAR_alignment
 output_folder=$gex_processing_folder/feature
 mkdir -p $output_folder
 
-#!/bin/bash
-
 # Check the value of $feature_type and set $feature_script accordingly
 if [ "$feature_type" == "gene_name" ]; then
     feature_script="gene.name.feature.sh"

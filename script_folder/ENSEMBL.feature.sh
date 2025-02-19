@@ -10,7 +10,7 @@ output_folder=$4
 
 
 featureCounts -a $gtf_file \
-              -o ${output_folder}/gene_assigned \
+              -o ${output_folder}/${sampleID}_gene_assigned \
               -R BAM ${input_folder}/${sampleID}Aligned.sortedByCoord.out.bam \
               -T 4;            
 samtools sort ${output_folder}/${sampleID}Aligned.sortedByCoord.out.bam.featureCounts.bam -o ${output_folder}/${sampleID}_assigned_sorted.bam;

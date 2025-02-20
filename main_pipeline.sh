@@ -32,7 +32,7 @@ gex_processing_folder=$project_folder/gex_processing
 gdo_processing_folder=$project_folder/gdo_processing
 
 # define the length of read 2, which can only be a numeric value of 54 or 55 - the sgRNA counting script will not work if the read 2 length is not 54 or 55
-read2_length=55
+read2_length=54
 
 # feature type will set the feature.sh script to output counts using ENSEMBL IDs or gene names - this parameter must equal "gene_name" or "ENSEMBL" or the script won't run
 feature_type="gene_name"

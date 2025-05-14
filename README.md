@@ -1,5 +1,9 @@
-# perturbsci-pipeline
-A processing pipeline that will take fastq reads produced from a PerturbSci library preparation with a NextSeq 550 75 cycle kit and output a counts matrix and provides a script to make a seurat object. This is run on Croen due to the parallelization. You need to run `bcl2fastq` yourself on NYGC clusters and move the fastqs over to our servers. There is an example of what the `bcl2fastq.sh` script should look like (with comments explaining how to run it) and an example of the associated sample sheet (`sample_sheet.csv`) required to run `bcl2fastq`.
+# perturbsci-pipeline-novaseq
+An updated processing pipeline that will take fastq reads produced from a PerturbSci library preparation with a NovaSeqX 25B 100 cycle kit and output a counts matrix and provides a script to make a seurat object. This is run on Croen due to the parallelization. You need to run `bcl2fastq` yourself on NYGC clusters and move the fastqs over to our servers. There is an example of what the `bcl2fastq.sh` script should look like (with comments explaining how to run it) and an example of the associated sample sheet (`sample_sheet.csv`) required to run `bcl2fastq`.
+
+With the cycle numbers of the NovaSeq we are able to now have paired end reads. Additionally, there is lane information necessary to appropriate demultiplexing as two samples have overlapping barcodes but are separated by NovaSeq lane. 
+
+This is a work in progress and ever evolving pipeline.
 
 ## Create the conda environment
 Create a conda environment with the required packages from the provided YAML file.

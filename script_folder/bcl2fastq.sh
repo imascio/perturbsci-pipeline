@@ -43,6 +43,9 @@ fastq=${dir}/fastq
 
 mkdir ${fastq}
 
+now="$(date +"%T")"
+echo "bcl2fastq - start : $now"
+
 bcl2fastq --runfolder-dir /gpfs/commons/instruments/nextseq/NB552173/241022_NB552173_0394_AHYNF7BGXW \
 	-o ${fastq} \
 	--sample-sheet ${dir}/sample_sheet.csv \
@@ -53,5 +56,8 @@ bcl2fastq --runfolder-dir /gpfs/commons/instruments/nextseq/NB552173/241022_NB55
 	--minimum-trimmed-read-length 0 \
 	--mask-short-adapter-reads 0 \
  	-p 8
+
+now="$(date +"%T")"
+echo "bcl2fastq - end : $now"
 
 multiqc ${fastq}

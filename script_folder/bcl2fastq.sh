@@ -30,8 +30,12 @@
 ## bcl2fastq command.
 #########
 module purge
-module load bcl2fastq/2.20.0.422
-module load multiqc/1.8
+### pe2 modules - old NYGC cluster not in use anymore
+##module load bcl2fastq/2.20.0.422
+##module load multiqc/1.8
+### ne1 modules
+module load bcl2fastq2/2.20.0-GCC-12.2.0
+module load multiqc/1.22.3-foss-2023b
 
 dir=/gpfs/commons/groups/satija_lab/imascio/RBP_screen/241022_sequencing_71APA_redo
 
@@ -45,9 +49,9 @@ bcl2fastq --runfolder-dir /gpfs/commons/instruments/nextseq/NB552173/241022_NB55
 	--reports-dir ${fastq}/report \
 	--barcode-mismatches 1 \
 	--create-fastq-for-index-reads \
-	--no-lane-splitting \
 	--use-bases-mask Y*,I*,Y*,Y* \
 	--minimum-trimmed-read-length 0 \
-	--mask-short-adapter-reads 0
+	--mask-short-adapter-reads 0 \
+ 	-p 8
 
 multiqc ${fastq}

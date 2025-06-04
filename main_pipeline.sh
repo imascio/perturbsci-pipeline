@@ -54,8 +54,8 @@ N_JOBS=16
 index="/brahms/shared/EasySci/human/STAR_original_pipeline"
 
 # define the gtf file for gene counting
-# Human genome version 42
-gtf_file="/brahms/shared/EasySci/human/gencode.v42.primary_assembly.annotation.gtf"
+# Human genome version 44 - downloaded from 10X 2024 cellranger build
+gtf_file="/brahms/shared/refdata-gex-GRCh38-2024-A/genes/genes.gtf"
 
 # define the gtf file for exon counting
 # Human genome version 42
@@ -81,6 +81,26 @@ gRNA_annotation_df=$project_folder/APA_1SRSF7_sgRNA_info_table.txt
 # define the name of the final seuart object - should be .rds extension
 seurat_object_name=rna1_seurat_obj.rds
 
+
+######### NEW STUFF ##########################
+
+############ CREATING SAMPLE SHEET FROM FASTQS ############
+
+# 
+
+input_folder=$fastq_folder
+script=$script_path/01_make_sample_ID_files.sh
+
+now=$(date +"%T")
+echo "~~~~~~~~~~~~~~~~~~" >&2
+echo "01. Collecting samples names from gex and gdo fastq files... $now" >&2
+
+bash $script $input_folder $sample_ID $gdo_sample_ID
+
+now=$(date +"%T")
+echo "Sample sheets made. $now" >&2
+
+######### END NEW STUFF ##########################
 ############ BARCODE EXTRACTION ############
 
 # the script take an input folder, a sample ID list, an output folder, the RT barcode list, the ligation barcode list and core number and a rendom hexamer barcode list. Then it extract the RT barcode from read1, the ligation barocde from read2, correct them to the nearest RT and ligation barcode (with edit distance <= 1), and attach the RT and ligation barcode and UMI sequence to the read name of read1 and read3. Reads with unmatched RT or ligation barcodes are discarded.
@@ -90,14 +110,16 @@ output_folder=$gex_processing_folder/BC_attach
 script=$script_path/barcode_extraction.py
 
 now=$(date +"%T")
-echo "Changing the name of the gex fastq files... $now" >&2
+echo "~~~~~~~~~~~~~~~~~~" >&2
+echo "02. Changing the name of the gex fastq files... $now" >&2
 
 echo $sample_ID >&2
 
-for sample in $(cat $sample_ID); do echo changing name $sample; mv $input_folder/*$sample*R1*.fastq.gz $input_folder/$sample.R1.fastq.gz; mv $input_folder/*$sample*R2*.fastq.gz $input_folder/$sample.R2.fastq.gz; mv $input_folder/*$sample*R3*.fastq.gz $input_folder/$sample.R3.fastq.gz; done
+for sample in $(cat $sample_ID); do echo changing name $sample; mv $input_folder/*$sample*R1*.fastq.gz $input_folder/$sample.R1.fastq.gz; mv $input_folder/*$sample*R2*.fastq.gz $input_folder/$sample.R2.fastq.gz; mv $input_folder/*$sample*R3*.fastq.gz $input_folder/$sample.R3.fastq.gz; mv $input_folder/*$sample*I1*.fastq.gz $input_folder/$sample.I1.fastq.gz; done
 
 now=$(date +"%T")
-echo "Attaching barcode and UMI.... $now" >&2
+echo "~~~~~~~~~~~~~~~~~~" >&2
+echo "03. Attaching barcode and UMI.... $now" >&2
 
 mkdir -p $output_folder
 
@@ -109,9 +131,9 @@ echo "Barcode transformed and UMI attached. $now" >&2
 ################# TRIM READ 2 #################
 
 # This steps trims any poly A stretches present in read 2
-
+echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "Trimming read 2... $now" >&2
+echo "04. Trimming read 2... $now" >&2
 
 input_folder=$gex_processing_folder/BC_attach
 output_folder=$gex_processing_folder/trimmed_fastq
@@ -122,9 +144,9 @@ parallel -j ${N_JOBS} --verbose bash $script_path/trimming.sh $input_folder {} $
 ################# REMOVE EMPTY LINES #################
 
 # This step removes any empty fastq lines resulting from trimming reads that are entirely poly A
-
+echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "Removing empty lines from fastqs... $now" >&2
+echo "05. Removing empty lines from fastqs... $now" >&2
 
 input_folder=$gex_processing_folder/trimmed_fastq
 output_folder=$gex_processing_folder/cleaned_fastq
@@ -136,9 +158,9 @@ now=$(date +"%T")
 echo "Empty lines removed. $now" >&2
 
 ############ ALIGN ############
-
+echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "Aligning cleaned fastq files... $now" >&2
+echo "06. Aligning cleaned fastq files... $now" >&2
 
 input_folder=$gex_processing_folder/cleaned_fastq
 output_folder=$gex_processing_folder/STAR_alignment
@@ -152,9 +174,9 @@ echo "Alignment complete. $now" >&2
 ############ FEATURE ############
 
 # This step maps aligned reads to genes using the umi tools feature function
-
+echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "Mapping reads to genes... $now" >&2
+echo "07. Mapping reads to genes... $now" >&2
 
 input_folder=$gex_processing_folder/STAR_alignment
 output_folder=$gex_processing_folder/feature
@@ -181,9 +203,9 @@ echo "Mapping to genes complete. $now" >&2
 ############ DEDUP BAMS ############
 
 # Remove UMI duplicates and generate a cell x gene counts matrix
-
+echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "Generating a counts matrix! Almost done w gex processing... $now" >&2
+echo "08. Generating a counts matrix! Almost done w gex processing... $now" >&2
 
 input_folder=$gex_processing_folder/feature
 output_folder=$gex_processing_folder/dedup
@@ -194,9 +216,9 @@ parallel -j ${N_JOBS} --verbose bash $script_path/dedup.sh $input_folder $output
 ############ COUNT ############
 
 # Remove UMI duplicates and generate a cell x gene counts matrix
-
+echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "Generating a counts matrix! Almost done w gex processing... $now" >&2
+echo "09. Generating a counts matrix! Almost done w gex processing... $now" >&2
 
 input_folder=$gex_processing_folder/feature
 output_folder=$gex_processing_folder/count
@@ -210,16 +232,16 @@ parallel -j ${N_JOBS} --verbose bash $script_path/count.sh $input_folder $output
 mkdir -p $gdo_processing_folder
 
 # Change the file names of raw gdo fastq.gz
-
+echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "Changing the name of the gdo fastq files... $now" >&2
+echo "10. Changing the name of the gdo fastq files... $now" >&2
 
-for sample in $(cat $gdo_sample_ID); do echo changing name $sample; mv $fastq_folder/*$sample*R1_001.fastq.gz $fastq_folder/$sample.R1.fastq.gz; mv $fastq_folder/*$sample*R2_001.fastq.gz $fastq_folder/$sample.R2.fastq.gz; mv $fastq_folder/*$sample*R3_001.fastq.gz $fastq_folder/$sample.R3.fastq.gz; done
+for sample in $(cat $gdo_sample_ID); do echo changing name $sample; mv $fastq_folder/*$sample*R1*.fastq.gz $fastq_folder/$sample.R1.fastq.gz; mv $fastq_folder/*$sample*R2*.fastq.gz $fastq_folder/$sample.R2.fastq.gz; mv $fastq_folder/*$sample*R3*.fastq.gz $fastq_folder/$sample.R3.fastq.gz; mv $fastq_folder/*$sample*I1*.fastq.gz $fastq_folder/$sample.I1.fastq.gz; done
 
 # Run the guide counting script
-
+echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "Processing the gdo reads into single-cell counts matrix (must be reformatted for seurat later)... $now" >&2
+echo "11. Processing the gdo reads into single-cell counts matrix (must be reformatted for seurat later)... $now" >&2
 
 ## setting the guide counting script depending on the length of read 2
 if [ $read2_length -eq 55 ]; then
@@ -237,11 +259,11 @@ python3 ${script_path}/${guide_script} $fastq_folder ${gdo_sample_ID} $gdo_proce
 
 
 ############ SEURAT ############
-
+echo "~~~~~~~~~~~~~~~~~~" >&2
 # Make a seurat object from the counts matrices
 
 now=$(date +"%T")
-echo "Generating a seurat object! Last step... $now" >&2
+echo "12. Generating a seurat object! Last step... $now" >&2
 
 input_folder=$gex_processing_folder/count
 output_folder=$gex_processing_folder/seurat
@@ -250,4 +272,5 @@ mkdir -p $output_folder
 Rscript $script_path/make_seurat_object.R $sample_ID $input_folder $output_folder $seurat_object_name $gdo_processing_folder $script_path $gdo_sample_ID
 
 now=$(date +"%T")
-echo "You're done ;) $now" >&2
+echo "You're done - good luck! $now" >&2
+echo "~~~~~~~~~~~~~~~~~~" >&2

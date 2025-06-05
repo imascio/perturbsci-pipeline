@@ -32,7 +32,7 @@ gex_processing_folder=$project_folder/gex_processing
 gdo_processing_folder=$project_folder/gdo_processing
 
 # define the length of read 2, which can only be a numeric value of 54 or 55 - the sgRNA counting script will not work if the read 2 length is not 54 or 55
-read2_length=54
+read2_length=55
 
 # feature type will set the feature.sh script to output counts using ENSEMBL IDs or gene names - this parameter must equal "gene_name" or "ENSEMBL" or the script won't run
 feature_type="gene_name"
@@ -51,7 +51,7 @@ N_JOBS=16
 
 # define the location of index files for reads alignment with STAR
 # Human genome version 42
-index="/brahms/shared/EasySci/human/STAR_original_pipeline"
+index="/brahms/shared/refdata-gex-GRCh38-2024-A/STAR_index_2.7.10b"
 
 # define the gtf file for gene counting
 # Human genome version 44 - downloaded from 10X 2024 cellranger build
@@ -74,12 +74,12 @@ randomN_barcode_file=$script_path/RandomN_RT_barcodes.txt
 inner_i7_bc_file=$script_path/simp_inner_i7_220517.pickle2
 
 #define the folder of gRNA barcode dictionary - this is experiment-specific
-gRNA_correction_file=$project_folder/APA_1SRSF7_sgRNAseq.pickle2
+gRNA_correction_file=/brahms/mascioi/RBP_screen/RBP_20bp_sgRNA_seq.pickle2
 #define the folder containing the gRNA annotation file - this is experiment-specific 
-gRNA_annotation_df=$project_folder/APA_1SRSF7_sgRNA_info_table.txt
+gRNA_annotation_df=/brahms/mascioi/RBP_screen/RBP_20bp_guide_info_table.txt
 
 # define the name of the final seuart object - should be .rds extension
-seurat_object_name=rna1_seurat_obj.rds
+seurat_object_name=pipeline_seurat_output.rds
 
 
 ######### NEW STUFF ##########################

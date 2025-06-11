@@ -41,20 +41,10 @@ for (i in 1:n_pcr_samples) {
   # save df without gene column and set gene column as rownames
   rownames(c) <- c$gene
   m <- as.matrix(c[,2:ncol(c)], nrow = nrow(c))
-  #genes.ens <- c$gene
   rownames(m) <- c$gene
-  #genes.ens.short <- gsub("(ENSG[0-9]+)\\.[0-9]+", "\\1", genes.ens)
-  #ids <- mapIds(org.Hs.eg.db,
-                #keys=genes.ens,
-                #column="SYMBOL",
-                #keytype="ENSEMBL",
-                #multiVals="first")
-  #rownames(m) <-ids
-  #n <- Azimuth:::ConvertEnsembleToSymbol(m, species = "human")
-  n <- m
-  gex.list[[i]] <- n
+  gex.list[[i]] <- m
   # saving seurat objects
-  obj <- CreateSeuratObject(counts = n, min.features = 200)
+  obj <- CreateSeuratObject(counts = m, min.features = 200)
   obj$pcr_barcode <- name
   gex.seuratv5.list[[i]] <- obj
   print("done")
@@ -178,25 +168,6 @@ obj <- objv5
 obj[["GDO"]] <- CreateAssayObject(counts = gdo.subset)
 #################################################################################################
 
-##############################ADD GDO META#############################################
-## adding guide metadata - you can skip this section if you want
-# making dataframe with cell names, guide counts, and a binning category
-guide.meta <- data.frame(cells = names(obj$nCount_GDO), counts = obj$nCount_GDO, guide_group = NA)
-# guides less than 10
-guide.meta[guide.meta$counts < 10, 3] <- "<10"
-# guides 10 to less than 50
-guide.meta[guide.meta$counts >= 10 & guide.meta$counts < 50, 3] <- "10-50"
-# guides 50 to less than 100
-guide.meta[guide.meta$counts >= 50 & guide.meta$counts < 100, 3] <- "50-100"
-# guides 100 or more
-guide.meta[guide.meta$counts >= 100, 3] <- "100+"
-
-
-guide.meta2 <- data.frame(sgRNA_count = guide.meta$guide_group, row.names = guide.meta$cells)
-
-obj <- AddMetaData(obj, metadata = guide.meta2)
-
-#######################################################################################
 
 #######################################save the final object!################################################
 saveRDS(obj, paste0(args[3],"/",args[4]))

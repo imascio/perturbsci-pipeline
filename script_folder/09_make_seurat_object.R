@@ -17,7 +17,7 @@ for (package_name in packages_to_install) {
 rm(package_name, packages_to_install)
 
 ## read in arguments following terminal command
-# order of arguments 1)gex_sampleID.txt 2)input_dir_counts_matrix 3)output_dir 4)output_name.rds 5)gdo_processing_dir 6)script_folder 7)gdo_sampleID.txt
+# order of arguments 1)gex_sampleID.txt 2)input_dir_counts_matrix 3)output_dir 4)output_name.rds 5)gdo_processing_dir 6)script_folder 7)gdo_sampleID.txt 8) gex to gdo match table
 args <- commandArgs(trailingOnly = TRUE)
 
 ############################GEX PROCESSING####################################################
@@ -117,11 +117,8 @@ gdo_bc_combinations <- data.frame(inneri7 = gsub("\\..*","",colnames_gdo),
                                   lig = substr(gsub(".*\\.","",colnames_gdo) , start = 1 , stop = 10))
 
 # making inner i7 list - need both gex and gdo sample info to correctly combine the pcr rna barcodes
-gdo.df <- expand.grid(c("TCGGATTCGG", "CTAAGCCTTG", "CTAACTAGGT", "GCAAGACCGT", "ATGGAACGAA", "TAGAGGCGTT", "GCATCGTATG", "TGGACGACTA"),gdo_names[,1])
-sample_inner_combos <- paste0(gdo.df$Var2, gdo.df$Var1)
-i7list <- data.frame(i7_ID = sample_names[,1],
-                     inneri7 = sample_inner_combos)
-gdo_bc_i7ID <- left_join(x = gdo_bc_combinations, y = i7list)
+i7list <- read.csv(args[8])
+gdo_bc_i7ID <- left_join(x = gdo_bc_combinations, y = i7list, by = join_by(inneri7))
 
 # if your shortdT RT plates do not have matching sgRNA barcodes you can use this commented out code
 # to match the sgRNA capture barcode with the barcode of the corresponding shortdT barcode plate (in this example it's plate 2)
@@ -136,7 +133,7 @@ gdo_bc_i7ID <- left_join(x = gdo_bc_combinations, y = i7list)
 # the new plates have sgRNA capture match the RT shortdT barcodes so RT and sgRNA capture sequences are the same 
 gdo_bc_i7ID$RT <- gdo_bc_i7ID$sgRNAcapture
 
-new_gd_colnames <- paste0(gdo_bc_i7ID$i7_ID, "_" ,gdo_bc_i7ID$lig,gdo_bc_i7ID$RT)
+new_gd_colnames <- paste0(gdo_bc_i7ID$GEX, "_" ,gdo_bc_i7ID$lig,gdo_bc_i7ID$RT)
 colnames(gRNA_mat) <- new_gd_colnames
 
 

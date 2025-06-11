@@ -78,6 +78,9 @@ gRNA_correction_file=/brahms/mascioi/RBP_screen/RBP_20bp_sgRNA_seq.pickle2
 #define the folder containing the gRNA annotation file - this is experiment-specific 
 gRNA_annotation_df=/brahms/mascioi/RBP_screen/RBP_20bp_guide_info_table.txt
 
+# table with two columns - "GEX" which is the gex_sampleID and "inneri7" which is the corresponding gdo_sampmleID + inneri7
+# this is to rename the gdo matrix to have matching cell names as the gex counts matrix
+match_table="/brahms/mascioi/RBP_screen/novaseq/full.gex.gdo.colnames.matching.for.making.seurat.object.csv"
 # define the name of the final seuart object - should be .rds extension
 seurat_object_name=pipeline_seurat_output.rds
 
@@ -269,7 +272,7 @@ input_folder=$gex_processing_folder/count
 output_folder=$gex_processing_folder/seurat
 mkdir -p $output_folder
 
-Rscript $script_path/09_make_seurat_object.R $sample_ID $input_folder $output_folder $seurat_object_name $gdo_processing_folder $script_path $gdo_sample_ID
+Rscript $script_path/09_make_seurat_object.R $sample_ID $input_folder $output_folder $seurat_object_name $gdo_processing_folder $script_path $gdo_sample_ID $match_table
 
 now=$(date +"%T")
 echo "You're done - good luck! $now" >&2

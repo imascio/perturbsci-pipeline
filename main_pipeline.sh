@@ -203,22 +203,22 @@ echo "Mapping to genes complete. $now" >&2
 ############ DEDUP BAMS ############
 
 # Remove UMI duplicates and generate a cell x gene counts matrix
-echo "~~~~~~~~~~~~~~~~~~" >&2
-now=$(date +"%T")
-echo "08. Generating a counts matrix! Almost done w gex processing... $now" >&2
+# echo "~~~~~~~~~~~~~~~~~~" >&2
+# now=$(date +"%T")
+# echo "08. Generating a counts matrix! Almost done w gex processing... $now" >&2
 
-input_folder=$gex_processing_folder/feature
-output_folder=$gex_processing_folder/dedup
-mkdir -p $output_folder
+# input_folder=$gex_processing_folder/feature
+# output_folder=$gex_processing_folder/dedup
+# mkdir -p $output_folder
 
-parallel -j ${N_JOBS} --verbose bash $script_path/dedup.sh $input_folder $output_folder {} :::: ${sample_ID}
+# parallel -j ${N_JOBS} --verbose bash $script_path/dedup.sh $input_folder $output_folder {} :::: ${sample_ID}
 
 ############ COUNT ############
 
 # Remove UMI duplicates and generate a cell x gene counts matrix
 echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "09. Generating a counts matrix! Almost done w gex processing... $now" >&2
+echo "08. Generating a counts matrix! Almost done w gex processing... $now" >&2
 
 input_folder=$gex_processing_folder/feature
 output_folder=$gex_processing_folder/count
@@ -234,14 +234,14 @@ mkdir -p $gdo_processing_folder
 # Change the file names of raw gdo fastq.gz
 echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "10. Changing the name of the gdo fastq files... $now" >&2
+echo "9. Changing the name of the gdo fastq files... $now" >&2
 
 for sample in $(cat $gdo_sample_ID); do echo changing name $sample; mv $fastq_folder/*$sample*R1*.fastq.gz $fastq_folder/$sample.R1.fastq.gz; mv $fastq_folder/*$sample*R2*.fastq.gz $fastq_folder/$sample.R2.fastq.gz; mv $fastq_folder/*$sample*R3*.fastq.gz $fastq_folder/$sample.R3.fastq.gz; mv $fastq_folder/*$sample*I1*.fastq.gz $fastq_folder/$sample.I1.fastq.gz; done
 
 # Run the guide counting script
 echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "11. Processing the gdo reads into single-cell counts matrix (must be reformatted for seurat later)... $now" >&2
+echo "10. Processing the gdo reads into single-cell counts matrix (must be reformatted for seurat later)... $now" >&2
 
 ## setting the guide counting script depending on the length of read 2
 if [ $read2_length -eq 55 ]; then

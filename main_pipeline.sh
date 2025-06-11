@@ -107,11 +107,11 @@ echo "Sample sheets made. $now" >&2
 
 input_folder=$fastq_folder
 output_folder=$gex_processing_folder/BC_attach
-script=$script_path/barcode_extraction_parallel.py
+script=$script_path/02_barcode_extraction_parallel.py
 
 now=$(date +"%T")
 echo "~~~~~~~~~~~~~~~~~~" >&2
-echo "02. Changing the name of the gex fastq files... $now" >&2
+echo "01.5. Changing the name of the gex fastq files... $now" >&2
 
 echo $sample_ID >&2
 
@@ -119,7 +119,7 @@ for sample in $(cat $sample_ID); do echo changing name $sample; mv $input_folder
 
 now=$(date +"%T")
 echo "~~~~~~~~~~~~~~~~~~" >&2
-echo "03. Attaching barcode and UMI.... $now" >&2
+echo "02. Attaching barcode and UMI.... $now" >&2
 
 mkdir -p $output_folder
 
@@ -133,26 +133,26 @@ echo "Barcode transformed and UMI attached. $now" >&2
 # This steps trims any poly A stretches present in read 2
 echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "04. Trimming read 2... $now" >&2
+echo "03. Trimming read 2... $now" >&2
 
 input_folder=$gex_processing_folder/BC_attach
 output_folder=$gex_processing_folder/trimmed_fastq
 mkdir -p $output_folder
 
-parallel -j ${N_JOBS} --verbose bash $script_path/trimming.sh $input_folder {} $output_folder :::: ${sample_ID}
+parallel -j ${N_JOBS} --verbose bash $script_path/03_trimming.sh $input_folder {} $output_folder :::: ${sample_ID}
 
 ################# REMOVE EMPTY LINES #################
 
 # This step removes any empty fastq lines resulting from trimming reads that are entirely poly A
 echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "05. Removing empty lines from fastqs... $now" >&2
+echo "04. Removing empty lines from fastqs... $now" >&2
 
 input_folder=$gex_processing_folder/trimmed_fastq
 output_folder=$gex_processing_folder/cleaned_fastq
 mkdir -p $output_folder
 
-parallel -j ${N_JOBS} --verbose bash ${script_path}/remove_empty_lines.sh {} $input_folder ${output_folder} :::: ${sample_ID}
+parallel -j ${N_JOBS} --verbose bash ${script_path}/04_remove_empty_lines.sh {} $input_folder ${output_folder} :::: ${sample_ID}
 
 now=$(date +"%T")
 echo "Empty lines removed. $now" >&2
@@ -160,13 +160,13 @@ echo "Empty lines removed. $now" >&2
 ############ ALIGN ############
 echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "06. Aligning cleaned fastq files... $now" >&2
+echo "05. Aligning cleaned fastq files... $now" >&2
 
 input_folder=$gex_processing_folder/cleaned_fastq
 output_folder=$gex_processing_folder/STAR_alignment
 mkdir -p $output_folder
 
-parallel -j ${N_JOBS} --verbose bash $script_path/align.sh $index {} $input_folder $output_folder $tmp_folder :::: ${sample_ID}
+parallel -j ${N_JOBS} --verbose bash $script_path/05_align.sh $index {} $input_folder $output_folder $tmp_folder :::: ${sample_ID}
 
 now=$(date +"%T")
 echo "Alignment complete. $now" >&2
@@ -176,7 +176,7 @@ echo "Alignment complete. $now" >&2
 # This step maps aligned reads to genes using the umi tools feature function
 echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "07. Mapping reads to genes... $now" >&2
+echo "06. Mapping reads to genes... $now" >&2
 
 input_folder=$gex_processing_folder/STAR_alignment
 output_folder=$gex_processing_folder/feature
@@ -184,9 +184,9 @@ mkdir -p $output_folder
 
 # Check the value of $feature_type and set $feature_script accordingly
 if [ "$feature_type" == "gene_name" ]; then
-    feature_script="gene.name.feature.sh"
+    feature_script="06_gene.name.feature.sh"
 elif [ "$feature_type" == "ENSEMBL" ]; then
-    feature_script="ENSEMBL.feature.sh"
+    feature_script="06_ENSEMBL.feature.sh"
 else
     echo "Error: feature_type must be either 'gene_name' or 'ENSEMBL'"
     exit 1
@@ -205,26 +205,26 @@ echo "Mapping to genes complete. $now" >&2
 # Remove UMI duplicates and generate a cell x gene counts matrix
 # echo "~~~~~~~~~~~~~~~~~~" >&2
 # now=$(date +"%T")
-# echo "08. Generating a counts matrix! Almost done w gex processing... $now" >&2
+# echo "06.5. Generating a counts matrix! Almost done w gex processing... $now" >&2
 
 # input_folder=$gex_processing_folder/feature
 # output_folder=$gex_processing_folder/dedup
 # mkdir -p $output_folder
 
-# parallel -j ${N_JOBS} --verbose bash $script_path/dedup.sh $input_folder $output_folder {} :::: ${sample_ID}
+# parallel -j ${N_JOBS} --verbose bash $script_path/06.5_dedup.sh $input_folder $output_folder {} :::: ${sample_ID}
 
 ############ COUNT ############
 
 # Remove UMI duplicates and generate a cell x gene counts matrix
 echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "08. Generating a counts matrix! Almost done w gex processing... $now" >&2
+echo "07. Generating a counts matrix! Almost done w gex processing... $now" >&2
 
 input_folder=$gex_processing_folder/feature
 output_folder=$gex_processing_folder/count
 mkdir -p $output_folder
 
-parallel -j ${N_JOBS} --verbose bash $script_path/count.sh $input_folder $output_folder {} :::: ${sample_ID}
+parallel -j ${N_JOBS} --verbose bash $script_path/07_count.sh $input_folder $output_folder {} :::: ${sample_ID}
 
 
 ############ GDO ############
@@ -234,20 +234,20 @@ mkdir -p $gdo_processing_folder
 # Change the file names of raw gdo fastq.gz
 echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "9. Changing the name of the gdo fastq files... $now" >&2
+echo "07.5. Changing the name of the gdo fastq files... $now" >&2
 
 for sample in $(cat $gdo_sample_ID); do echo changing name $sample; mv $fastq_folder/*$sample*R1*.fastq.gz $fastq_folder/$sample.R1.fastq.gz; mv $fastq_folder/*$sample*R2*.fastq.gz $fastq_folder/$sample.R2.fastq.gz; mv $fastq_folder/*$sample*R3*.fastq.gz $fastq_folder/$sample.R3.fastq.gz; mv $fastq_folder/*$sample*I1*.fastq.gz $fastq_folder/$sample.I1.fastq.gz; done
 
 # Run the guide counting script
 echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
-echo "10. Processing the gdo reads into single-cell counts matrix (must be reformatted for seurat later)... $now" >&2
+echo "08. Processing the gdo reads into single-cell counts matrix (must be reformatted for seurat later)... $now" >&2
 
 ## setting the guide counting script depending on the length of read 2
 if [ $read2_length -eq 55 ]; then
-    guide_script="sgrna_20bp_count.py"
+    guide_script="08_sgrna_20bp_count.py"
 elif [ $read2_length -eq 54 ]; then
-    guide_script="sgrna_19bp_count.py"
+    guide_script="08_sgrna_19bp_count.py"
 else
     echo "Error: read2_length must be either 54 or 55"
     exit 1
@@ -263,13 +263,13 @@ echo "~~~~~~~~~~~~~~~~~~" >&2
 # Make a seurat object from the counts matrices
 
 now=$(date +"%T")
-echo "12. Generating a seurat object! Last step... $now" >&2
+echo "09. Generating a seurat object! Last step... $now" >&2
 
 input_folder=$gex_processing_folder/count
 output_folder=$gex_processing_folder/seurat
 mkdir -p $output_folder
 
-Rscript $script_path/make_seurat_object.R $sample_ID $input_folder $output_folder $seurat_object_name $gdo_processing_folder $script_path $gdo_sample_ID
+Rscript $script_path/09_make_seurat_object.R $sample_ID $input_folder $output_folder $seurat_object_name $gdo_processing_folder $script_path $gdo_sample_ID
 
 now=$(date +"%T")
 echo "You're done - good luck! $now" >&2

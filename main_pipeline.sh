@@ -107,7 +107,7 @@ echo "Sample sheets made. $now" >&2
 
 input_folder=$fastq_folder
 output_folder=$gex_processing_folder/BC_attach
-script=$script_path/barcode_extraction.py
+script=$script_path/barcode_extraction_parallel.py
 
 now=$(date +"%T")
 echo "~~~~~~~~~~~~~~~~~~" >&2
@@ -123,7 +123,7 @@ echo "03. Attaching barcode and UMI.... $now" >&2
 
 mkdir -p $output_folder
 
-python $script $input_folder $sample_ID $output_folder $ligation_barcode $RT_barcode $core $randomN_barcode_file
+parallel -j ${N_JOBS} --verbose python $script $input_folder {} $output_folder $ligation_barcode $RT_barcode $core $randomN_barcode_file :::: $sample_ID
 
 now=$(date +"%T")
 echo "Barcode transformed and UMI attached. $now" >&2

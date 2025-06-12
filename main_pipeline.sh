@@ -250,8 +250,13 @@ echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
 echo "07.5. Changing the name of the gdo fastq files... $now" >&2
 
-for sample in $(cat $gdo_sample_ID); do echo changing name $sample; mv $fastq_folder/*$sample*R1*.fastq.gz $fastq_folder/$sample.R1.fastq.gz; mv $fastq_folder/*$sample*R2*.fastq.gz $fastq_folder/$sample.R2.fastq.gz; mv $fastq_folder/*$sample*R3*.fastq.gz $fastq_folder/$sample.R3.fastq.gz; mv $fastq_folder/*$sample*I1*.fastq.gz $fastq_folder/$sample.I1.fastq.gz; done
-
+for sample in $(cat $gdo_sample_ID); do 
+    echo "changing name $sample"
+    cat $input_folder/*$sample*R1*.fastq.gz > $output_fastq/$sample.R1.fastq.gz
+    cat $input_folder/*$sample*I2*.fastq.gz > $output_fastq/$sample.R2.fastq.gz
+    cat $input_folder/*$sample*R2*.fastq.gz > $output_fastq/$sample.R3.fastq.gz
+    cat $input_folder/*$sample*I1*.fastq.gz > $output_fastq/$sample.I1.fastq.gz
+done
 # Run the guide counting script
 echo "~~~~~~~~~~~~~~~~~~" >&2
 now=$(date +"%T")
@@ -269,7 +274,7 @@ fi
 # Print the script variable to verify
 echo "The selected script is: $guide_script"
 
-python3 ${script_path}/${guide_script} $fastq_folder ${gdo_sample_ID} $gdo_processing_folder $RT_barcode $inner_i7_bc_file $ligation_barcode $gRNA_correction_file $gRNA_annotation_df $cutoff $core
+python3 ${script_path}/${guide_script} $output_fastq ${gdo_sample_ID} $gdo_processing_folder $RT_barcode $inner_i7_bc_file $ligation_barcode $gRNA_correction_file $gRNA_annotation_df $cutoff $core
 
 
 ############ SEURAT ############

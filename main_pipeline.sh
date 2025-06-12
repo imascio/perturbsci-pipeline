@@ -122,7 +122,13 @@ mkdir -p $output_fastq
 
 # NextSeq outputs R1 reads as R1 fastq, I1 reads as I1 fastq, I2 reads as R2 fastq, and R2 reads and R3 fastq
 # NovaSeq outputs fastqs with the same name as the reads. So I am both combining lanes and changing fastq names to match NextSeq naming scheme and won't have to change later scripts
-for sample in $(cat $sample_ID); do echo changing name $sample; mv $input_folder/*$sample*R1*.fastq.gz $output_fastq/$sample.R1.fastq.gz; mv $input_folder/*$sample*I2*.fastq.gz $output_fastq/$sample.R2.fastq.gz; mv $input_folder/*$sample*R2*.fastq.gz $output_fastq/$sample.R3.fastq.gz; mv $input_folder/*$sample*I1*.fastq.gz $output_fastq/$sample.I1.fastq.gz; done
+for sample in $(cat $sample_ID); do 
+    echo "changing name $sample"
+    cat $input_folder/*$sample*R1*.fastq.gz > $output_fastq/$sample.R1.fastq.gz
+    cat $input_folder/*$sample*I2*.fastq.gz > $output_fastq/$sample.R2.fastq.gz
+    cat $input_folder/*$sample*R2*.fastq.gz > $output_fastq/$sample.R3.fastq.gz
+    cat $input_folder/*$sample*I1*.fastq.gz > $output_fastq/$sample.I1.fastq.gz
+done
 
 now=$(date +"%T")
 echo "~~~~~~~~~~~~~~~~~~" >&2

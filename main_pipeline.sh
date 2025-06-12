@@ -252,10 +252,10 @@ echo "07.5. Changing the name of the gdo fastq files... $now" >&2
 
 for sample in $(cat $gdo_sample_ID); do 
     echo "changing name $sample"
-    cat $input_folder/*$sample*R1*.fastq.gz > $output_fastq/$sample.R1.fastq.gz
-    cat $input_folder/*$sample*I2*.fastq.gz > $output_fastq/$sample.R2.fastq.gz
-    cat $input_folder/*$sample*R2*.fastq.gz > $output_fastq/$sample.R3.fastq.gz
-    cat $input_folder/*$sample*I1*.fastq.gz > $output_fastq/$sample.I1.fastq.gz
+    cat $fastq_folder/*$sample*R1*.fastq.gz > $output_fastq/$sample.R1.fastq.gz
+    cat $fastq_folder/*$sample*I2*.fastq.gz > $output_fastq/$sample.R2.fastq.gz
+    cat $fastq_folder/*$sample*R2*.fastq.gz > $output_fastq/$sample.R3.fastq.gz
+    cat $fastq_folder/*$sample*I1*.fastq.gz > $output_fastq/$sample.I1.fastq.gz
 done
 # Run the guide counting script
 echo "~~~~~~~~~~~~~~~~~~" >&2

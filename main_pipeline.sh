@@ -128,6 +128,7 @@ now=$(date +"%T")
 echo "~~~~~~~~~~~~~~~~~~" >&2
 echo "02. Attaching barcode and UMI.... $now" >&2
 
+input_folder=$output_fastq
 mkdir -p $output_folder
 
 parallel -j ${N_JOBS} --verbose python $script $input_folder {} $output_folder $ligation_barcode $RT_barcode $core $randomN_barcode_file :::: $sample_ID

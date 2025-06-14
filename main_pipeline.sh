@@ -264,7 +264,7 @@ echo "08. Processing the gdo reads into single-cell counts matrix (must be refor
 
 ## setting the guide counting script depending on the length of read 2
 if [ $read2_length -eq 55 ]; then
-    guide_script="08_sgrna_20bp_count.py"
+    guide_script="08_sgrna_20bp_count_lig_in_header.py"
 elif [ $read2_length -eq 54 ]; then
     guide_script="08_sgrna_19bp_count.py"
 else

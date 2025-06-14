@@ -2,6 +2,7 @@ import subprocess
 import sys
 import os
 import gzip
+import re
 from multiprocessing import Pool
 from functools import partial
 import pickle

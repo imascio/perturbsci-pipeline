@@ -48,6 +48,8 @@ samtools_core=16
 
 # define the number of jobs for parallelizing
 N_JOBS=16
+# STAR uses a lot of memory and cannot run as many jobs when you have large data from novaseq
+N_JOBS_STAR=10
 
 # define the location of index files for reads alignment with STAR
 # Human genome version 42
@@ -180,7 +182,7 @@ input_folder=$gex_processing_folder/cleaned_fastq
 output_folder=$gex_processing_folder/STAR_alignment
 mkdir -p $output_folder
 
-parallel -j ${N_JOBS} --verbose bash $script_path/05_align.sh $index {} $input_folder $output_folder $tmp_folder :::: ${sample_ID}
+parallel -j ${N_JOBS_STAR} --verbose bash $script_path/05_align.sh $index {} $input_folder $output_folder $tmp_folder :::: ${sample_ID}
 
 now=$(date +"%T")
 echo "Alignment complete. $now" >&2
